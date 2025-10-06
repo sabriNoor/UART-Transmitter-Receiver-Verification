@@ -1,4 +1,4 @@
-module Tx_Path(
+module Tx(
     input logic clk, reset,
     input logic [Data_Width-1:0] data_in,
     input logic tx_valid,
