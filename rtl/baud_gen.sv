@@ -21,7 +21,7 @@ module Baud_Gen (
     
     else begin
       
-      if(count >= (Divisor/2) -1 ) begin
+      if(counter >= (Divisor/2) -1 ) begin
         bclk<= ~bclk; // toggle the bclk
         counter<=0;
       end
