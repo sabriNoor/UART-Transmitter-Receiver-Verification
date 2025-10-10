@@ -1,4 +1,8 @@
-module Tx(
+module Tx #(
+    parameter Data_Width = 8,
+    parameter OverSampling = 16
+)
+(
     input logic clk, reset,
     input logic [Data_Width-1:0] data_in,
     input logic tx_valid,
@@ -6,10 +10,7 @@ module Tx(
     output logic tx,
     input logic parity_en,
     input logic parity_type  // 0 even, 1 odd
-);
-
-    parameter Data_Width = 8;
-    parameter OverSampling = 16;
+); 
 
     localparam Counter_Width = $clog2(OverSampling);
     logic [Counter_Width-1:0] clk_count;

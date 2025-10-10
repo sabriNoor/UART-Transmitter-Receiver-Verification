@@ -1,4 +1,8 @@
-module Rx(
+module Rx #(
+    parameter Data_Width = 8,
+    parameter OverSampling = 16
+) 
+(
     input  logic clk,
     input  logic reset,
     input  logic rx,               // serial input line
@@ -8,9 +12,6 @@ module Rx(
     output logic rx_valid,
     output logic parity_error,
 );
-
-    parameter Data_Width = 8;
-    parameter OverSampling = 16;
 
     localparam Counter_Width = $clog2(OverSampling);
     logic [Counter_Width-1:0] clk_count;
