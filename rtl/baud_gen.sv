@@ -1,11 +1,12 @@
-module Baud_Gen (
+module Baud_Gen #(
+  parameter Baud_Rate=9600, // 9600 bps
+  parameter Clk_Freq= 576 * (10**3), // 576kh
+  parameter OverSampling= 16 // x16
+)
+(
   input logic clk, reset,
   output logic bclk
-  );
-  
-  parameter Baud_Rate=9600; // 9600 bps
-  parameter Clk_Freq= 576 * (10**3); // 576kh
-  parameter OverSampling= 16; // x16
+);
   
   localparam Divisor= (Clk_Freq/(Baud_Rate*OverSampling))+0.5; 
   
