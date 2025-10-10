@@ -56,7 +56,7 @@ module Tx(
         end       
     end
 
-    
+    // Bit index, shift and data register
     always @(posedge clk or negedge reset) begin
         if(!reset) begin
             bit_index <= 0;
@@ -77,28 +77,20 @@ module Tx(
       
     end
 
-    // FSM and output logic
+    // FSM 
     always_comb begin
-        next_state = current_state;
-        tx_ready = 0;
-        tx = 1; // Default to idle state
-        
         case(current_state)
-            IDLE: begin
-                tx_ready = 1;
-                tx = 1; // idle state
+            IDLE: begin              
                 if(tx_valid) begin
                     next_state = START;
                 end
             end
-            START: begin
-                tx = 0; // start bit
+            START: begin             
                 if(clk_count == (OverSampling - 1)) begin
                     next_state = DATA;
                 end
             end
             DATA: begin
-                tx = shift_reg[0]; // LSB first
                 if((clk_count == (OverSampling - 1))) begin
                     if(bit_index == Data_Width - 1) begin
                         next_state = PARITY;
@@ -106,13 +98,11 @@ module Tx(
                 end
             end
             PARITY: begin
-               tx = parity_type == 0 ? ~^data_reg  : ^data_reg; 
                 if(clk_count == (OverSampling - 1)) begin
-                    next_state = DATA;
+                    next_state = STOP;
                 end
             end
             STOP: begin
-                tx = 1; // stop bit
                 if(clk_count == (OverSampling - 1)) begin
                     next_state = DONE;
                 end
@@ -122,6 +112,41 @@ module Tx(
             end
             default: next_state = IDLE;
         endcase
+    end
+
+    // Output Logic
+    always_comb begin
+        if(!reset) begin
+            tx = 1;
+            tx_ready = 0;
+        end
+        else begin
+            tx_ready = 0;
+            case(current_state)
+                IDLE: begin
+                    tx = 1; // idle
+                    tx_ready = 1;
+                    if(tx_valid)
+                        tx_ready = 0;
+                end
+                START: begin
+                    tx = 0; // start bit
+                end
+                DATA: begin
+                    tx = shift_reg[0]; // LSB first
+                end
+                PARITY: begin
+                    tx = parity_type == 0 ? ~^data_reg : ^data_reg; // even/odd
+                end
+                STOP: begin
+                    tx = 1; // stop bit
+                end
+                default: begin
+                    tx = 1;
+                    tx_ready = 1;
+                end
+            endcase
+        end
     end
 
 endmodule
